@@ -1009,6 +1009,7 @@ bool CommandProcessor::ExecutePacketType3_WAIT_REG_MEM(memory::RingBuffer* reade
         break;
     }
     if (!matched) {
+      OnWaitRegMemPoll(is_memory, poll_reg_addr, attempts);
       if (wait >= 0x100) {
         PrepareForWait();
         if (!graphics_system_->IsVSyncEnabled()) {

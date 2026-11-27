@@ -264,6 +264,19 @@ class REX_GPU_XENOS_API CommandProcessor : public rex::NonCopyable {
   virtual void SyncCoherency();
   virtual void PrepareForWait();
   virtual void ReturnFromWait();
+  /**
+   * Called from the WAIT_REG_MEM loop for every poll that did not match, before the back-off.
+   *
+   * A memory wait polls guest RAM, so a value the GPU has not written yet -- or that the backend
+   * has not committed the work for yet -- is invisible however long the poll runs. A backend that
+   * defers command buffer submission needs this point to commit and converge the polled dword; the
+   * default does nothing, which is the hardware behaviour of polling the bus.
+   *
+   * @param is_memory True for a memory predicate, false for a register predicate.
+   * @param address   The polled address (physical, or a register index for a register wait).
+   * @param attempt   Zero-based count of misses on this packet.
+   */
+  virtual void OnWaitRegMemPoll(bool /*is_memory*/, u32 /*address*/, u32 /*attempt*/) {}
 
   u32 ExecutePrimaryBuffer(u32 start_index, u32 end_index);
   virtual void OnPrimaryBufferEnd() {}
